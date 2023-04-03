@@ -1,7 +1,9 @@
 COARDAS
 =======
 
-The **CO**pernicus **A**nalysis **R**eady **D**ata **AS**ssimilation toolkit --COARDAS-- offers a command line utility for assimilating available Copernicus datasets. The toolkit is designed to run with local access to the data (e.g. on the TerraScope platform (https://remotesensing.vito.be/case/terrascope), but the toolkit can also fallback to downloading the data to a local machine.
+The **CO**pernicus **A**nalysis **R**eady **D**ata **AS**ssimilation toolkit --COARDAS-- offers a command line utility for assimilating available datasets in the Copernicus Global Land Service (CGLS). The toolkit is designed to run with local access to the data (e.g. on the TerraScope platform (https://remotesensing.vito.be/case/terrascope), but the toolkit can also fallback to downloading the data to a local machine.
+
+COARDAS' discrete resampling is based on and compatible with the routines that have been drafted and published by CGLS: https://github.com/cgls/ResampleTool_notebook_Python
 
 Command: ingest
 ------
@@ -43,3 +45,10 @@ Some of these packages (eg. GDAL) can be difficult to build, especially on windo
     $ git clone https://github.com/interob/coardas
     $ cd coardas
     $ pip3 install .
+
+License & Warranty
+------------------
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
