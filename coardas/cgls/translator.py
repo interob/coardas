@@ -158,12 +158,19 @@ class CGLSTranslator:
                 xr.set_options(keep_attrs=True)
                 rio.set_options(skip_missing_spatial_dims=False)
                 with xr.open_dataset(datafile, mask_and_scale=False) as ds:
+                    valid_range = ds[variable].attrs["valid_range"]
                     ds: xr.Dataset
                     grid = (
                         ds[variable]
                         .isel(lon=slice(window[0], window[2]), lat=slice(window[1], window[3]))
                         .to_numpy()
                     )[0, :, :]
+                    grid = np.where(
+                        (grid >= valid_range[0]) & (grid <= valid_range[1]),
+                        grid,
+                        ds[variable].attrs["_FillValue"],
+                    )
+
                     output_path = output_path.with_suffix(".tif")
                     if output_path.exists():
                         output_path.unlink()
@@ -171,7 +178,7 @@ class CGLSTranslator:
                         output_path.parent.mkdir(parents=True, exist_ok=True)
 
                     with rasterio.open(
-                        output_path.with_suffix(".tif"),
+                        output_path,
                         "w",
                         width=window[2] - window[0],
                         height=window[3] - window[1],
@@ -341,9 +348,14 @@ class CGLSResamplingTranslator(CGLSTranslator):
                         .to_numpy()
                         .astype(np.dtype("B"))
                     )[0, :, :]
+                    output_path = output_path.with_suffix(".tif")
+                    if output_path.exists():
+                        output_path.unlink()
+                    else:
+                        output_path.parent.mkdir(parents=True, exist_ok=True)
 
                     with rasterio.open(
-                        output_path.with_suffix(".tif"),
+                        output_path,
                         "w",
                         width=grid.shape[1],
                         height=grid.shape[0],
