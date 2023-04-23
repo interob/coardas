@@ -99,7 +99,7 @@ class CGLSProductAccessor:
                 return mirrorfile
         elif mirrorfile is None or self.__mirror_is_readonly:
             if mirrorfile == targetfile:
-                raise RuntimeError("Attempt to write to read-only mirror!")
+                raise RuntimeError(f"Attempt to write to read-only mirror! ({mirrorfile})")
             downloadfile = targetfile.with_suffix(".coardasdl")
         else:
             downloadfile = mirrorfile.with_suffix(".coardasdl")
