@@ -54,7 +54,7 @@ class CGLSProductAccessor:
         return -1
 
     def is_advertised(self, timestep: Dekad):
-        path = timestep.resolve(self.__product.patn_data)
+        path = timestep.resolve(self.__product.patn_manifest)
         if self.__get_manifest_index(path) >= 0:
             log.info(f"!HIT: {path}")
             return True
@@ -71,8 +71,8 @@ class CGLSProductAccessor:
         (option: return_mirror_location) return the direct path to the  mirror location for the downloaded file without
         copying to the target location (not passing a target location implicies returning of mirror location!).
         """
-        datafile = timestep.resolve(self.__product.patn_data)
-        if (i := self.__get_manifest_index(datafile)) < 0:
+        datafile = timestep.resolve(self.__product.patn_datafile)
+        if (i := self.__get_manifest_index(timestep.resolve(self.__product.patn_manifest))) < 0:
             return None
 
         mirrorfile: Path = None
