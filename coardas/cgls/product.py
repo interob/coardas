@@ -104,7 +104,7 @@ CGLS_NDVI300_GLOBE_OLCI_V201 = CGLSProduct(
         "variable": "NDVI",
         "manifest": f"{manifest_baseurl}/ndvi300_v2_333m/manifest_cgls_ndvi300_v2_333m_latest.txt",
         "patn_manifest": "$(yyyy)/$(mm)/$(dd)/NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1/c_gls_NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1.nc",
-        "patn_datafile": "$(yyyy)$(mm)$(dd)/NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1/c_gls_NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1.nc",
+        "patn_datafile": "$(yyyy)/$(yyyy)$(mm)$(dd)/c_gls_NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1.nc",
         # {datapool_veg_baseurl}/NDVI_300m_V2/
         "patn_metadata": "$(yyyy)/$(mm)/$(dd)/NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1/c_gls_NDVI300_PROD-DESC_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.1.xml",
         "resolution": "300m",
@@ -116,7 +116,7 @@ CGLS_NDVI1K_GLOBE_PROBAV_V301 = CGLSProduct(
         "variable": "NDVI",
         "manifest": f"{manifest_baseurl}/ndvi_v3_1km/manifest_cgls_ndvi_v3_1km_latest.txt",
         "patn_manifest": "$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1.nc",
-        "patn_datafile": "$(yyyy)$(mm)$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1.nc",
+        "patn_datafile": "$(yyyy)/$(yyyy)$(mm)$(dd)/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1.nc",
         # {datapool_veg_baseurl}/NDVI_1km_V3/
         "patn_metadata": "$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1.xml",
         "resolution": "1km",
@@ -128,7 +128,7 @@ CGLS_NDVI1K_GLOBE_VGT_V301 = CGLSProduct(
         "variable": "NDVI",
         "manifest": f"{manifest_baseurl}/ndvi_v3_1km/manifest_cgls_ndvi_v3_1km_latest.txt",
         "patn_manifest": "$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1.nc",
-        "patn_datafile": "$(yyyy)$(mm)$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1.nc",
+        "patn_datafile": "$(yyyy)/$(yyyy)$(mm)$(dd)/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1.nc",
         # {datapool_veg_baseurl}/NDVI_1km_V3/
         "patn_metadata": "$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.1.xml",
         "resolution": "1km",
