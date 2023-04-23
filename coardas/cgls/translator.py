@@ -5,6 +5,7 @@ actual pixels per degree.
 
 Author: Rob Marjot, March 2023
 """
+import logging
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
@@ -13,6 +14,8 @@ import rasterio
 import rioxarray as rio
 import xarray as xr
 from rasterio.io import BufferedDatasetWriter
+
+log = logging.getLogger(__name__)
 
 
 class CGLSTranslator:
@@ -311,6 +314,8 @@ class CGLSResamplingTranslator(CGLSTranslator):
         def sign(value) -> int:
             return 1 if value >= 0 else -1
 
+        log.info(f"Translating: {datafile}...")
+
         with xr.open_dataset(datafile, mask_and_scale=False) as ds:
             aoi = self.get_aligned_aoi(my_ext)
             da: xr.DataArray = ds[variable].sel(
@@ -354,6 +359,7 @@ class CGLSResamplingTranslator(CGLSTranslator):
                     else:
                         output_path.parent.mkdir(parents=True, exist_ok=True)
 
+                    log.info(f"Writing: {output_path}...")
                     with rasterio.open(
                         output_path,
                         "w",
@@ -392,5 +398,5 @@ class CGLSResamplingTranslator(CGLSTranslator):
                 try:
                     __options.pop("enable_cftimeindex", None)
                     xr.set_options(**__options)
-                except Exception:
+                except BaseException:
                     pass
