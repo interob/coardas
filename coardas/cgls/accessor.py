@@ -4,6 +4,7 @@ class plugs in to the cataloging system based on manifest end point as current h
 
 Author: Rob Marjot, March 2023
 """
+import logging
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +16,8 @@ from tqdm import tqdm
 from coardas.cgls.product import CGLSProduct
 from coardas.cgls.translator import CGLSTranslator
 from coardas.objects.timeslicing import Dekad
+
+log = logging.getLogger(__name__)
 
 
 class CGLSProductAccessor:
@@ -194,6 +197,7 @@ class CGLSProductAssimilator:
                     break
                 i += 1
             if i == len(self.__products):
+                log.error(f"No product found for {cursor}")
                 return False
             if i not in product_first_hit:
                 product_first_hit[i] = cursor
@@ -229,6 +233,7 @@ class CGLSProductAssimilator:
             )
             self.__aligned_aoi = find_aligned_aoi(len(translators) - 1)
             if self.__aligned_aoi is None:
+                log.error("Unable to establish an aligned AOI across products")
                 return False
 
         return True
