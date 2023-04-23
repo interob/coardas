@@ -104,6 +104,17 @@ CGLS_NDVI300_GLOBE_OLCI_V201 = CGLSProduct(
     }
 )
 
+CGLS_NDVI1K_GLOBE_PROBAV_V301 = CGLSProduct(
+    **{
+        "variable": "NDVI",
+        "manifest": f"{manifest_baseurl}/ndvi_v3_1km/manifest_cgls_ndvi_v3_1km_latest.txt",
+        "patn_data": "$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1.nc",
+        # {datapool_veg_baseurl}/NDVI_1km_V3/
+        "patn_metadata": "$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.1.xml",
+        "resolution": "1km",
+    }
+)
+
 CGLS_NDVI1K_GLOBE_VGT_V301 = CGLSProduct(
     **{
         "variable": "NDVI",

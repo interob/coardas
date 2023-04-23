@@ -18,6 +18,7 @@ ingest.py CGLS_NDVI300_GLOBE_OLCI_V201 CGLS_NDVI1K_GLOBE_VGT_V301 \
     -b "2020-06-21" -e 2020-07-01 \
     --aoi -26.0 38.0 60.0 -35.0 \
     -m CGLS_NDVI300_GLOBE_OLCI_V201 ./data/NDVI_300m_V2 r \
+    -m CGLS_NDVI1K_GLOBE_PROBAV_V301 ./data/NDVI_1km_V3 r \
     -m CGLS_NDVI1K_GLOBE_VGT_V301 ./data/NDVI_1km_V3 r \
     -u <your copernicus username> -p <your copernicus password> \
     -s /var/tmp
