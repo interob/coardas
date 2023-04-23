@@ -13,13 +13,13 @@ import click
 
 from coardas.cgls.accessor import CGLSProductAssimilator
 from coardas.cgls.product import (
-    CGLS_NDVI1K_GLOBE_PROBAV_V301,
+    CGLS_NDVI1K_GLOBE_VGT_V301,
     CGLS_NDVI300_GLOBE_OLCI_V201,
     CGLSProduct,
 )
 
 __products: Dict[str, CGLSProduct] = {
-    "CGLS_NDVI1K_GLOBE_PROBAV_V301": CGLS_NDVI1K_GLOBE_PROBAV_V301,
+    "CGLS_NDVI1K_GLOBE_VGT_V301": CGLS_NDVI1K_GLOBE_VGT_V301,
     "CGLS_NDVI300_GLOBE_OLCI_V201": CGLS_NDVI300_GLOBE_OLCI_V201,
 }
 
@@ -28,7 +28,7 @@ __products: Dict[str, CGLSProduct] = {
 @click.argument(
     "products",
     nargs=-1,
-    type=click.Choice(["CGLS_NDVI300_GLOBE_OLCI_V201", "CGLS_NDVI1K_GLOBE_PROBAV_V301"]),
+    type=click.Choice(["CGLS_NDVI300_GLOBE_OLCI_V201", "CGLS_NDVI1K_GLOBE_VGT_V301"]),
 )
 @click.option(
     "--output",
