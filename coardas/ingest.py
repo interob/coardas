@@ -3,6 +3,7 @@ Ingest utility: concatenates available archives of compatible datasets into a si
 
 Author: Rob Marjot, March 2023
 """
+import logging
 import sys
 import tempfile
 from datetime import datetime
@@ -151,4 +152,5 @@ def cli_wrap():
 
 
 if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.INFO)
     cli_wrap()
