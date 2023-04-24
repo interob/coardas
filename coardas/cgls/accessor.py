@@ -247,7 +247,7 @@ class CGLSProductAssimilator:
     def ingest(self):
         assert self.__aligned_aoi is not None
 
-        def download(dekad: Dekad) -> Union[Path, None]:
+        def access_and_translate(dekad: Dekad) -> Union[Path, None]:
             for product in self.__products:
                 if product.is_advertised(dekad):
                     datafile = product.download(dekad)
@@ -266,8 +266,8 @@ class CGLSProductAssimilator:
 
         cursor: Dekad = Dekad(self.__begin_date)
         while not cursor.ends_after(Dekad(self.__end_date)):
-            datafile = download(cursor)
-            if datafile is None:
-                return
+            if not self.output_dir.joinpath(cursor.resolve(self.__naming_pattern)).exists(): 
+                if access_and_translate(cursor) is None:
+                    return
 
             cursor += 1

@@ -317,6 +317,8 @@ class CGLSResamplingTranslator(CGLSTranslator):
         log.info(f"Translating: {datafile}...")
 
         with xr.open_dataset(datafile, mask_and_scale=False) as ds:
+            chunks = dict(zip(ds[variable].dims, ds[variable].encoding["chunksizes"]))
+        with xr.open_dataset(datafile, mask_and_scale=False, chunks=chunks) as ds:
             aoi = self.get_aligned_aoi(my_ext)
             da: xr.DataArray = ds[variable].sel(
                 lon=slice(aoi[0], aoi[2]), lat=slice(aoi[1], aoi[3])
