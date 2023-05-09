@@ -180,6 +180,7 @@ class CGLSTranslator:
                     else:
                         output_path.parent.mkdir(parents=True, exist_ok=True)
 
+                    log.info(f"Writing: {output_path}...")
                     with rasterio.open(
                         output_path,
                         "w",
@@ -198,8 +199,8 @@ class CGLSTranslator:
                         dtype=str(grid.dtype),
                         nodata=ds[variable].attrs["_FillValue"],
                         driver="COG",
-                        tiled=True,
-                        comress="ZSTD",
+                        blocksize=256,
+                        compress="ZSTD",
                         level=22,
                         overviews="NONE",
                     ) as cog:
@@ -375,8 +376,8 @@ class CGLSResamplingTranslator(CGLSTranslator):
                         dtype=str(grid.dtype),
                         nodata=ds[variable].attrs["_FillValue"],
                         driver="COG",
-                        tiled=True,
-                        comress="ZSTD",
+                        blocksize=256,
+                        compress="ZSTD",
                         level=22,
                         overviews="NONE",
                     ) as cog:
