@@ -200,8 +200,8 @@ class CGLSTranslator:
                         nodata=ds[variable].attrs["_FillValue"],
                         driver="COG",
                         blocksize=256,
-                        compress="ZSTD",
-                        level=12,
+                        compress="LZW",
+                        level=9,
                         overviews="NONE",
                     ) as cog:
                         cog: BufferedDatasetWriter
@@ -377,8 +377,8 @@ class CGLSResamplingTranslator(CGLSTranslator):
                         nodata=ds[variable].attrs["_FillValue"],
                         driver="COG",
                         blocksize=256,
-                        compress="ZSTD",
-                        level=12,
+                        compress="LZW",
+                        level=9,
                         overviews="NONE",
                     ) as cog:
                         cog: BufferedDatasetWriter
