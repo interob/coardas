@@ -7,7 +7,7 @@ Author: Rob Marjot, March 2023
 """
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Union
+from typing import Dict, Optional, Union
 
 from dateutil.relativedelta import relativedelta
 
@@ -20,10 +20,14 @@ class Slice(ABC):
     def __init__(self) -> None:
         super().__init__()
 
-    def resolve(self, pattern: str) -> str:
+    def resolve(self, pattern: str, m: Optional[Dict[str, str]] = None) -> str:
         pattern = pattern.replace("$(yyyy)", str(self.year))
         pattern = pattern.replace("$(mm)", f"{self.month:02d}")
-        return pattern.replace("$(dd)", f"{self.day:02d}")
+        pattern = pattern.replace("$(dd)", f"{self.day:02d}")
+        if m is not None:
+            for key, value in m.items():
+                pattern = pattern.replace(f"$({key})", value)
+        return pattern
 
     @property
     @abstractmethod
@@ -155,8 +159,8 @@ class Dekad(Slice):
     def slice_count(self):
         return 36
 
-    def resolve(self, pattern: str) -> str:
-        return super().resolve(pattern).replace("$(mdekad)", f"{(((self.seqno-1)%3)+1):02d}")
+    def resolve(self, pattern: str, m: Optional[Dict[str, str]] = None) -> str:
+        return super().resolve(pattern, m).replace("$(mdekad)", f"{(((self.seqno-1)%3)+1):02d}")
 
     def add(self, diff) -> Slice:
         dekads = (self.year * 36) + self.seqno + diff

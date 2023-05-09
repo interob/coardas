@@ -5,6 +5,7 @@ class plugs in to the cataloging system based on manifest end point as current h
 Author: Rob Marjot, March 2023
 """
 import logging
+import re
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -47,15 +48,16 @@ class CGLSProductAccessor:
     def product(self):
         return self.__product
 
-    def __get_manifest_index(self, path: str) -> int:
+    def __get_manifest_index(self, patn_manifest: str) -> Tuple[int, Union[re.Match, None]]:
+        patn: re.Pattern = re.compile(f".+{patn_manifest}$")
         for i, datafile in enumerate(self.__manifest):
-            if datafile.endswith(path):
-                return i
-        return -1
+            if m := patn.match(datafile):
+                return (i, m)
+        return (-1, None)
 
-    def is_advertised(self, timestep: Dekad):
+    def is_advertised(self, timestep: Dekad) -> bool:
         path = timestep.resolve(self.__product.patn_manifest)
-        if self.__get_manifest_index(path) >= 0:
+        if self.__get_manifest_index(path)[0] >= 0:
             log.info(f"!HIT: {path}")
             return True
         else:
@@ -71,9 +73,14 @@ class CGLSProductAccessor:
         (option: return_mirror_location) return the direct path to the  mirror location for the downloaded file without
         copying to the target location (not passing a target location implicies returning of mirror location!).
         """
-        datafile = timestep.resolve(self.__product.patn_datafile)
-        if (i := self.__get_manifest_index(timestep.resolve(self.__product.patn_manifest))) < 0:
+
+        i, m = self.__get_manifest_index(timestep.resolve(self.__product.patn_manifest))
+        if i < 0:
             return None
+
+        datafile = timestep.resolve(
+            self.__product.patn_datafile, None if m is None else m.groupdict()
+        )
 
         mirrorfile: Path = None
         targetfile: Path = None
@@ -266,7 +273,7 @@ class CGLSProductAssimilator:
 
         cursor: Dekad = Dekad(self.__begin_date)
         while not cursor.ends_after(Dekad(self.__end_date)):
-            if not self.output_dir.joinpath(cursor.resolve(self.__naming_pattern)).exists(): 
+            if not self.output_dir.joinpath(cursor.resolve(self.__naming_pattern)).exists():
                 if access_and_translate(cursor) is None:
                     return
 
