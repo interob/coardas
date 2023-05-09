@@ -330,26 +330,21 @@ class CGLSResamplingTranslator(CGLSTranslator):
                 rio.set_options(skip_missing_spatial_dims=False)
                 try:
                     # Create the mask according to the fixed values
-                    print("create the mask according to the fixed values...")
                     valid_range = ds[variable].attrs["valid_range"]
                     da_msk = da.where((da >= valid_range[0]) & (da <= valid_range[1]))
 
                     # Create the coarsen dataset
-                    print("create the coarsen dataset...")
                     factor = self.native_resolution // self.target_resolution
                     coarsen = da_msk.coarsen(lat=factor, lon=factor, boundary="trim").mean()
 
                     # Force results to integer
-                    print("force results to integer...")
                     coarsen_int: xr.DataArray = np.rint(coarsen)
 
                     # Mask the dataset according to the minumum required values
-                    print("count values in coarsen window...")
                     vo = xr.where((da >= valid_range[0]) & (da <= valid_range[1]), 1, 0)
                     vo_cnt = vo.coarsen(lat=factor, lon=factor, boundary="trim").sum()
 
                     # Mask the dataset according to the minumum required values
-                    print("mask the dataset according to the minumum required values..")
                     grid = (
                         coarsen_int.where(vo_cnt >= 5, ds[variable].attrs["_FillValue"])
                         .to_numpy()
@@ -394,7 +389,7 @@ class CGLSResamplingTranslator(CGLSTranslator):
                 except Exception as ex:
                     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
                     message = template.format(type(ex).__name__, ex.args)
-                    print(message)
+                    log.error(message)
                     raise
             finally:
                 try:
