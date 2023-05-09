@@ -31,7 +31,13 @@ __products: Dict[str, CGLSProduct] = {
 @click.argument(
     "products",
     nargs=-1,
-    type=click.Choice(["CGLS_NDVI300_GLOBE_OLCI_V201", "CGLS_NDVI1K_GLOBE_PROBAV_V301", "CGLS_NDVI1K_GLOBE_VGT_V301"]),
+    type=click.Choice(
+        [
+            "CGLS_NDVI300_GLOBE_OLCI_V201",
+            "CGLS_NDVI1K_GLOBE_PROBAV_V301",
+            "CGLS_NDVI1K_GLOBE_VGT_V301",
+        ]
+    ),
 )
 @click.option(
     "--output",
@@ -152,5 +158,7 @@ def cli_wrap():
 
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO, format="[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s"
+    )
     cli_wrap()
