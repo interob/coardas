@@ -201,7 +201,7 @@ class CGLSTranslator:
                         driver="COG",
                         blocksize=256,
                         compress="ZSTD",
-                        level=22,
+                        level=12,
                         overviews="NONE",
                     ) as cog:
                         cog: BufferedDatasetWriter
@@ -378,7 +378,7 @@ class CGLSResamplingTranslator(CGLSTranslator):
                         driver="COG",
                         blocksize=256,
                         compress="ZSTD",
-                        level=22,
+                        level=12,
                         overviews="NONE",
                     ) as cog:
                         cog: BufferedDatasetWriter
