@@ -57,12 +57,7 @@ class CGLSProductAccessor:
 
     def is_advertised(self, timestep: Dekad) -> bool:
         path = timestep.resolve(self.__product.patn_manifest)
-        if self.__get_manifest_index(path)[0] >= 0:
-            log.info(f"!HIT: {path}")
-            return True
-        else:
-            log.info(f"miss: {path}")
-            return False
+        return self.__get_manifest_index(path)[0] >= 0
 
     def download(
         self, timestep: Dekad, target_location: Path = None, return_mirror_location: bool = True
