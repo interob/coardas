@@ -160,7 +160,7 @@ class Dekad(Slice):
         return 36
 
     def resolve(self, pattern: str, m: Optional[Dict[str, str]] = None) -> str:
-        return super().resolve(pattern, m).replace("$(mdekad)", f"{(((self.seqno-1)%3)+1):02d}")
+        return super().resolve(pattern, m).replace("$(mdekad)", f"{(((self.seqno-1)%3)+1)}")
 
     def add(self, diff) -> Slice:
         dekads = (self.year * 36) + self.seqno + diff
