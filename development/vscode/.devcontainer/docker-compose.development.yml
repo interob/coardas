@@ -11,7 +11,7 @@ services:
     command: /usr/bin/tail -f /dev/null
     volumes:
       - ../:/coardas
-      - ../../../copernicus-ndvi-1km:/data
+      - ~/Public/copernicus-ndvi-1km:/data
       - /data/MTDA/Copernicus/Land/global/netcdf:/mirror
     extra_hosts:
       - "host.docker.internal:host-gateway"

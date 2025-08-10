@@ -189,10 +189,14 @@ class CGLSTranslator:
                         count=1,
                         crs="EPSG:4326",
                         transform=rasterio.Affine.from_gdal(
-                            round(my_ext[0] - (0.5 / self.native_resolution), 8),
+                            round(
+                                my_ext[0] - (sign(self.gt[1]) * (0.5 / self.native_resolution)), 8
+                            ),
                             round(sign(self.gt[1]) * (1 / self.native_resolution), 8),
                             0.0,
-                            round(my_ext[1] + (0.5 / self.native_resolution), 8),
+                            round(
+                                my_ext[1] - (sign(self.gt[5]) * (0.5 / self.native_resolution)), 8
+                            ),
                             0.0,
                             round(sign(self.gt[5]) * (1 / self.native_resolution), 8),
                         ),
