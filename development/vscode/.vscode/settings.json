@@ -1,0 +1,25 @@
+{
+    "python.analysis.extraPaths": [
+        "/home/${env:LOCAL_PYTHONPATH}/.local/lib/python3.11/site-packages"
+    ],
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}",
+    },
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit" 
+    },
+    "html.validate.scripts": false,
+    "json.format.enable": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.promptToConfigure": true,
+    "python.testing.pytestArgs": [
+        "--cache-clear"
+    ],
+}

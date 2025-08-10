@@ -1,0 +1,21 @@
+// Use this config (or a symlink) in a .devcontainer folder which should sit
+// next to the amviewer Git repo checked out in folder "src"
+{
+    "name": "COARDAS development",
+    "dockerComposeFile": "docker-compose.development.yml",
+    "service": "toolkit",
+    "initializeCommand": "sed -e \"s/{{user}}/$(id -un)/ig\" -e \"s#{{dockerfile}}#$(pwd)/.devcontainer/Dockerfile#ig\" -e \"s#{{context}}#$(pwd)/src#ig\" ./src/development/vscode/.devcontainer/docker-compose.development.yml > ./.devcontainer/docker-compose.development.yml && cat ./src/docker/Dockerfile > ./.devcontainer/Dockerfile && sed -e \"s/{{user}}/$(id -un)/ig\" -e \"s/{{userid}}/$(id -u)/ig\" ./src/development/vscode/.devcontainer/DockerDevStage.template >> ./.devcontainer/Dockerfile",
+    "updateRemoteUserUID": true,
+    "workspaceFolder": "/coardas/src",
+    "containerEnv": {},
+    "postCreateCommand": "sudo pip install -e .[dev] --break-system-packages",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "eamodio.gitlens",
+                "charliermarsh.ruff"
+            ]
+        }
+    }
+}

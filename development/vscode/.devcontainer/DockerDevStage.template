@@ -1,0 +1,8 @@
+FROM build AS development
+
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
+RUN useradd --home-dir /home/{{user}} -mUl {{user}} -u {{userid}}
+RUN adduser {{user}} sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER {{user}}
+ENV PATH="$PATH:/home/{{user}}/.local/bin"

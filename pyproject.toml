@@ -1,3 +1,87 @@
+[project]
+name = "coardas"
+version = "0.2.01"
+description = "COpernicus Analysis Ready Data ASssimilation toolkit -- COARDAS"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Private :: Do Not Upload",
+]
+dependencies = [
+    "numpy<2.0.0",
+#    "gdal",
+    "click",
+    "requests",
+    "tqdm",
+    "dask[complete]",
+    "xarray",
+    "rioxarray",
+    "rasterio",
+    "netCDF4"
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "pytest",
+    "pytest-mock",
+    "pytest-socket",
+    "pytest-cov",
+    "pre-commit",
+    "ruff==0.9.6"
+]
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.config"
+]
+
+[tool.setuptools.packages.find]
+include = ["coardas"]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".eggs",
+    ".git",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "migrations",
+    "venv",
+    "*_settings.py"
+]
+
+line-length = 100
+indent-width = 4
+
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E4", "E7", "E9", "F", "W", "I"]  # "C901"
+ignore = []
+
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+docstring-code-format = false
+docstring-code-line-length = "dynamic"

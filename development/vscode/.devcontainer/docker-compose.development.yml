@@ -1,0 +1,17 @@
+
+services:
+  toolkit:
+    build:
+      dockerfile: "{{dockerfile}}"
+      context: "{{context}}"
+      target: development
+    container_name: coardas_development
+    user: {{user}}
+    restart: unless-stopped
+    command: /usr/bin/tail -f /dev/null
+    volumes:
+      - ../:/coardas
+      - ../../../copernicus-ndvi-1km:/data
+      - ../../../Public/mirror:/mirror
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

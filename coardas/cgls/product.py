@@ -3,6 +3,7 @@ Product classes for products in the Copernicus Global Land Service (CGLS) progra
 
 Author: Rob Marjot, March 2023
 """
+
 from pathlib import Path
 
 import xarray as xr

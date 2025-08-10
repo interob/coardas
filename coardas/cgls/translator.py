@@ -5,6 +5,7 @@ actual pixels per degree.
 
 Author: Rob Marjot, March 2023
 """
+
 import logging
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -104,24 +105,24 @@ class CGLSTranslator:
             return array[idx]
 
         assert my_ext[0] <= my_ext[2], (
-            "min Longitude is bigger than correspond Max, " "pls change position or check values."
+            "min Longitude is bigger than correspond Max, pls change position or check values."
         )
         assert my_ext[1] >= my_ext[3], (
-            "min Latitude is bigger than correspond Max, " "pls change position or check values."
+            "min Latitude is bigger than correspond Max, pls change position or check values."
         )
-        assert (
-            self.lons[0] <= my_ext[0] <= self.lons[-1]
-        ), "min Longitudinal value out of original dataset Max ext."
-        assert (
-            self.lats[-1] <= my_ext[1] <= self.lats[0]
-        ), "Max Latitudinal value out of original dataset Max ext."
+        assert self.lons[0] <= my_ext[0] <= self.lons[-1], (
+            "min Longitudinal value out of original dataset Max ext."
+        )
+        assert self.lats[-1] <= my_ext[1] <= self.lats[0], (
+            "Max Latitudinal value out of original dataset Max ext."
+        )
 
-        assert (
-            self.lons[0] <= my_ext[2] <= self.lons[-1]
-        ), "Max Longitudinal value out of original dataset Max ext."
-        assert (
-            self.lats[-1] <= my_ext[3] <= self.lats[0]
-        ), "min Latitudinal value out of original dataset Max ext."
+        assert self.lons[0] <= my_ext[2] <= self.lons[-1], (
+            "Max Longitudinal value out of original dataset Max ext."
+        )
+        assert self.lats[-1] <= my_ext[3] <= self.lats[0], (
+            "min Latitudinal value out of original dataset Max ext."
+        )
 
         return (
             find_nearest(self.lons, my_ext[0]),
@@ -261,24 +262,24 @@ class CGLSResamplingTranslator(CGLSTranslator):
             return 1 if value >= 0 else -1
 
         assert my_ext[0] <= my_ext[2], (
-            "min Longitude is bigger than correspond Max, " "pls change position or check values."
+            "min Longitude is bigger than correspond Max, pls change position or check values."
         )
         assert my_ext[1] >= my_ext[3], (
-            "min Latitude is bigger than correspond Max, " "pls change position or check values."
+            "min Latitude is bigger than correspond Max, pls change position or check values."
         )
         assert (
             self.lons[0] <= my_ext[0] <= self.lons[-1]  # ds.lon
         ), "min Longitudinal value out of original dataset Max ext."
-        assert (
-            self.lats[-1] <= my_ext[1] <= self.lats[0]
-        ), "Max Latitudinal value out of original dataset Max ext."
+        assert self.lats[-1] <= my_ext[1] <= self.lats[0], (
+            "Max Latitudinal value out of original dataset Max ext."
+        )
 
-        assert (
-            self.lons[0] <= my_ext[2] <= self.lons[-1]
-        ), "Max Longitudinal value out of original dataset Max ext."
-        assert (
-            self.lats[-1] <= my_ext[3] <= self.lats[0]
-        ), "min Latitudinal value out of original dataset Max ext."
+        assert self.lons[0] <= my_ext[2] <= self.lons[-1], (
+            "Max Longitudinal value out of original dataset Max ext."
+        )
+        assert self.lats[-1] <= my_ext[3] <= self.lats[0], (
+            "min Latitudinal value out of original dataset Max ext."
+        )
 
         dy = round(self.shape[0] * sign(self.gt[5]) * (1 / self.native_resolution))
         dx = round(self.shape[1] * sign(self.gt[1]) * (1 / self.native_resolution))
