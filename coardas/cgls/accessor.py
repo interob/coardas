@@ -10,7 +10,6 @@ import re
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 import requests
 from tqdm import tqdm
@@ -34,7 +33,7 @@ class CGLSProductAccessor:
         username: str,
         password: str,
         product: CGLSProduct,
-        mirror: Optional[Path] = None,
+        mirror: Path | None = None,
         mirror_is_readonly: bool = False,
     ) -> None:
         self.__username = username
@@ -49,7 +48,7 @@ class CGLSProductAccessor:
     def product(self):
         return self.__product
 
-    def __get_manifest_index(self, patn_manifest: str) -> Tuple[int, Union[re.Match, None]]:
+    def __get_manifest_index(self, patn_manifest: str) -> tuple[int, re.Match | None]:
         patn: re.Pattern = re.compile(f".+{patn_manifest}$")
         for i, datafile in enumerate(self.__manifest):
             if m := patn.match(datafile):
@@ -62,7 +61,7 @@ class CGLSProductAccessor:
 
     def download(
         self, timestep: Dekad, target_location: Path = None, return_mirror_location: bool = True
-    ) -> Union[Path, None]:
+    ) -> Path | None:
         """
         Robust downloading of the data file or retrieval from mirror. When actual download is needed and  the accesor
         is configured to have a non read-only mirror, the download is saved in mirror -- in which case the download may
@@ -147,7 +146,7 @@ class CGLSProductAssimilator:
     def __init__(
         self,
         target_resolution: str,
-        target_aoi: Tuple[float, float, float, float],
+        target_aoi: tuple[float, float, float, float],
         output_dir: Path,
         naming_pattern: str,
         begin_date: datetime,
@@ -156,8 +155,8 @@ class CGLSProductAssimilator:
         password: str,
         scratch: Path = None,
     ) -> None:
-        self.__products: List[CGLSProductAccessor] = []
-        self.__resamplers: List[CGLSTranslator] = []
+        self.__products: list[CGLSProductAccessor] = []
+        self.__resamplers: list[CGLSTranslator] = []
         self.__target_resolution = target_resolution
         self.__target_aoi = target_aoi
         self.__output_dir = output_dir
@@ -186,7 +185,7 @@ class CGLSProductAssimilator:
         return self.__aligned_aoi
 
     def add(
-        self, product: CGLSProduct, mirror: Optional[Path] = None, mirror_is_readonly: bool = False
+        self, product: CGLSProduct, mirror: Path | None = None, mirror_is_readonly: bool = False
     ):
         self.__products.append(
             CGLSProductAccessor(
@@ -197,7 +196,7 @@ class CGLSProductAssimilator:
     def prepare(self) -> bool:
         # runs through begin - end to find first hit of every product
         # prepare aligned aoi
-        product_first_hit: Dict[int, Dekad] = {}
+        product_first_hit: dict[int, Dekad] = {}
         cursor: Dekad = Dekad(self.__begin_date)
         while not cursor.ends_after(Dekad(self.__end_date)):
             i = 0
@@ -214,9 +213,9 @@ class CGLSProductAssimilator:
                 break
             cursor += 1
 
-        translators: List[CGLSTranslator] = []
+        translators: list[CGLSTranslator] = []
 
-        def find_aligned_aoi(start_at: int) -> Union[Tuple[float, float, float, float], None]:
+        def find_aligned_aoi(start_at: int) -> tuple[float, float, float, float] | None:
             """
             Establishes an AOI that nicely aligns across translators; searches recursively as-needed
             for a box (worldly coordinates) that sufficiently aligns (at 8 decimals). Such an AOI does
@@ -250,7 +249,7 @@ class CGLSProductAssimilator:
     def ingest(self):
         assert self.__aligned_aoi is not None
 
-        def access_and_translate(dekad: Dekad) -> Union[Path, None]:
+        def access_and_translate(dekad: Dekad) -> Path | None:
             for product in self.__products:
                 if product.is_advertised(dekad):
                     datafile = product.download(dekad)

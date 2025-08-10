@@ -5,9 +5,10 @@ The Dekad class implements dekadal time stepping.
 
 Author: Rob Marjot, March 2023
 """
+
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, Optional, Union
+from typing import Union
 
 from dateutil.relativedelta import relativedelta
 
@@ -20,7 +21,7 @@ class Slice(ABC):
     def __init__(self) -> None:
         super().__init__()
 
-    def resolve(self, pattern: str, m: Optional[Dict[str, str]] = None) -> str:
+    def resolve(self, pattern: str, m: dict[str, str] | None = None) -> str:
         pattern = pattern.replace("$(yyyy)", str(self.year))
         pattern = pattern.replace("$(mm)", f"{self.month:02d}")
         pattern = pattern.replace("$(dd)", f"{self.day:02d}")
@@ -124,7 +125,9 @@ class Dekad(Slice):
     Implements the dekadal time slicing scheme. A Dekad instance represents a dekad.
     """
 
-    def __init__(self, date_or_year: Union[datetime, int] = None, seqno: int = None) -> None:
+    def __init__(
+        self, date_or_year: datetime | int | None = None, seqno: int | None = None
+    ) -> None:
         super().__init__()
         if not isinstance(date_or_year, datetime):
             assert isinstance(date_or_year, int)
@@ -159,8 +162,8 @@ class Dekad(Slice):
     def slice_count(self):
         return 36
 
-    def resolve(self, pattern: str, m: Optional[Dict[str, str]] = None) -> str:
-        return super().resolve(pattern, m).replace("$(mdekad)", f"{(((self.seqno-1)%3)+1)}")
+    def resolve(self, pattern: str, m: dict[str, str] | None = None) -> str:
+        return super().resolve(pattern, m).replace("$(mdekad)", f"{(((self.seqno - 1) % 3) + 1)}")
 
     def add(self, diff) -> Slice:
         dekads = (self.year * 36) + self.seqno + diff

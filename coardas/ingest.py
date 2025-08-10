@@ -3,12 +3,12 @@ Ingest utility: concatenates available archives of compatible datasets into a si
 
 Author: Rob Marjot, March 2023
 """
+
 import logging
 import sys
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import click
 
@@ -20,7 +20,7 @@ from coardas.cgls.product import (
     CGLSProduct,
 )
 
-__products: Dict[str, CGLSProduct] = {
+__products: dict[str, CGLSProduct] = {
     "CGLS_NDVI1K_GLOBE_VGT_V301": CGLS_NDVI1K_GLOBE_VGT_V301,
     "CGLS_NDVI1K_GLOBE_PROBAV_V301": CGLS_NDVI1K_GLOBE_PROBAV_V301,
     "CGLS_NDVI300_GLOBE_OLCI_V201": CGLS_NDVI300_GLOBE_OLCI_V201,
@@ -116,14 +116,14 @@ __products: Dict[str, CGLSProduct] = {
     default="",
 )
 def ingest(
-    products: List[str],
+    products: list[str],
     output_dir: str,
     resolution: str,
     naming_pattern: str,
     begin_date: datetime,
     end_date: datetime,
-    aoi: Tuple[float, float, float, float],
-    mirrors: Dict[str, Tuple[Path, bool]],
+    aoi: tuple[float, float, float, float],
+    mirrors: dict[str, tuple[Path, bool]],
     username: str,
     password: str,
     scratch_dir,

@@ -8,7 +8,6 @@ Author: Rob Marjot, March 2023
 
 import logging
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import rasterio
@@ -25,7 +24,7 @@ class CGLSTranslator:
     aligned to full pixels.
     """
 
-    __resolution_pixel_per_degree: Dict[str, int] = {"1km": 112, "300m": 336}
+    __resolution_pixel_per_degree: dict[str, int] = {"1km": 112, "300m": 336}
 
     @staticmethod
     def pixels_per_degree(resolution: str) -> int:
@@ -45,10 +44,10 @@ class CGLSTranslator:
 
     def __init__(
         self,
-        gt: Tuple[float, float, float, float, float, float],
-        shape: Tuple[int, int],
-        lats: List[float],
-        lons: List[float],
+        gt: tuple[float, float, float, float, float, float],
+        shape: tuple[int, int],
+        lats: list[float],
+        lons: list[float],
         native_resolution: int,
         scale_factor: float,
         add_offset: float,
@@ -77,19 +76,19 @@ class CGLSTranslator:
         return self.__add_offset
 
     @property
-    def gt(self) -> Tuple[float, float, float, float, float, float]:
+    def gt(self) -> tuple[float, float, float, float, float, float]:
         return self.__gt
 
     @property
-    def shape(self) -> Tuple[int, int]:
+    def shape(self) -> tuple[int, int]:
         return self.__shape
 
     @property
-    def lats(self) -> List[float]:
+    def lats(self) -> tuple[float]:
         return self.__lats
 
     @property
-    def lons(self) -> List[float]:
+    def lons(self) -> list[float]:
         return self.__lons
 
     @property
@@ -97,8 +96,8 @@ class CGLSTranslator:
         return self.__native_resolution
 
     def get_aligned_aoi(
-        self, my_ext: Tuple[float, float, float, float]
-    ) -> Tuple[float, float, float, float]:
+        self, my_ext: tuple[float, float, float, float]
+    ) -> tuple[float, float, float, float]:
         def find_nearest(array, value):
             array = np.asarray(array)
             idx = (np.abs(array - value)).argmin()
@@ -135,9 +134,9 @@ class CGLSTranslator:
         self,
         datafile: Path,
         variable: str,
-        my_ext: Tuple[float, float, float, float],
+        my_ext: tuple[float, float, float, float],
         output_path: Path,
-    ) -> Union[Path, None]:
+    ) -> Path | None:
         """
         Translate the data: subset and store as TIFF
         """
@@ -230,10 +229,10 @@ class CGLSTranslator:
 class CGLSResamplingTranslator(CGLSTranslator):
     def __init__(
         self,
-        gt: Tuple[float, float, float, float, float, float],
-        shape: Tuple[int, int],
-        lats: List[float],
-        lons: List[float],
+        gt: tuple[float, float, float, float, float, float],
+        shape: tuple[int, int],
+        lats: list[float],
+        lons: list[float],
         native_resolution: int,
         target_resolution: int,
         scale_factor: float,
@@ -251,8 +250,8 @@ class CGLSResamplingTranslator(CGLSTranslator):
         return self.__target_resolution
 
     def get_aligned_aoi(
-        self, my_ext: Tuple[float, float, float, float]
-    ) -> Tuple[float, float, float, float]:
+        self, my_ext: tuple[float, float, float, float]
+    ) -> tuple[float, float, float, float]:
         def find_nearest(array, value):
             array = np.asarray(array)
             idx = (np.abs(array - value)).argmin()
@@ -310,9 +309,9 @@ class CGLSResamplingTranslator(CGLSTranslator):
         self,
         datafile: Path,
         variable: str,
-        my_ext: Tuple[float, float, float, float],
+        my_ext: tuple[float, float, float, float],
         output_path: Path,
-    ) -> Union[Path, None]:
+    ) -> Path | None:
         def sign(value) -> int:
             return 1 if value >= 0 else -1
 
