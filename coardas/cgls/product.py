@@ -97,13 +97,13 @@ class CGLSProduct:
                     )
 
 
-manifest_baseurl = "https://land.copernicus.vgt.vito.be/manifest"
+manifest_baseurl = "https://globalland.vito.be/download/manifest"
 # datapool_veg_baseurl = "https://land.copernicus.vgt.vito.be/PDF/datapool/Vegetation/Indicators"
 
 CGLS_NDVI300_GLOBE_OLCI_V201 = CGLSProduct(
     **{
         "variable": "NDVI",
-        "manifest": f"{manifest_baseurl}/ndvi300_v2_333m/manifest_cgls_ndvi300_v2_333m_latest.txt",
+        "manifest": f"{manifest_baseurl}/ndvi_300m_v2_10daily_netcdf/manifest_clms_global_ndvi_300m_v2_10daily_netcdf_latest.txt",
         "patn_manifest": r"$(yyyy)/$(mm)/$(dd)/NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.\d+/c_gls_NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.(?P<run_number>\d+).nc",
         "patn_datafile": r"$(yyyy)/$(yyyy)$(mm)$(dd)/c_gls_NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.$(run_number).nc",
         "patn_metadata": r"$(yyyy)/$(mm)/$(dd)/NDVI300_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.$(run_number)/c_gls_NDVI300_PROD-DESC_$(yyyy)$(mm)$(dd)0000_GLOBE_OLCI_V2.0.$(run_number).xml",
@@ -114,7 +114,7 @@ CGLS_NDVI300_GLOBE_OLCI_V201 = CGLSProduct(
 CGLS_NDVI1K_GLOBE_PROBAV_V301 = CGLSProduct(
     **{
         "variable": "NDVI",
-        "manifest": f"{manifest_baseurl}/ndvi_v3_1km/manifest_cgls_ndvi_v3_1km_latest.txt",
+        "manifest": f"{manifest_baseurl}/ndvi_1km_v3_10daily_netcdf/manifest_clms_global_ndvi_1km_v3_10daily_netcdf_latest.txt",
         "patn_manifest": r"$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.\d+/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.(?P<run_number>\d+).nc",
         "patn_datafile": r"$(yyyy)/$(yyyy)$(mm)$(dd)/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.$(run_number).nc",
         "patn_metadata": r"$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.$(run_number)/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_PROBAV_V3.0.$(run_number).xml",
@@ -125,7 +125,7 @@ CGLS_NDVI1K_GLOBE_PROBAV_V301 = CGLSProduct(
 CGLS_NDVI1K_GLOBE_VGT_V301 = CGLSProduct(
     **{
         "variable": "NDVI",
-        "manifest": f"{manifest_baseurl}/ndvi_v3_1km/manifest_cgls_ndvi_v3_1km_latest.txt",
+        "manifest": f"{manifest_baseurl}/ndvi_1km_v3_10daily_netcdf/manifest_clms_global_ndvi_1km_v3_10daily_netcdf_latest.txt",
         "patn_manifest": r"$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.\d+/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.(?P<run_number>\d+).nc",
         "patn_datafile": r"$(yyyy)/$(yyyy)$(mm)$(dd)/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.$(run_number).nc",
         "patn_metadata": r"$(yyyy)/$(mm)/$(dd)/NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.$(run_number)/c_gls_NDVI_$(yyyy)$(mm)$(dd)0000_GLOBE_VGT_V3.0.$(run_number).xml",
