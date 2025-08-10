@@ -12,6 +12,6 @@ services:
     volumes:
       - ../:/coardas
       - ../../../copernicus-ndvi-1km:/data
-      - ../../../Public/mirror:/mirror
+      - /data/MTDA/Copernicus/Land/global/netcdf:/mirror
     extra_hosts:
       - "host.docker.internal:host-gateway"
