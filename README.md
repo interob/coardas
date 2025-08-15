@@ -12,14 +12,15 @@ The script `ingest` concatenates available archives of compatible datasets into 
 - 300m Sentinel 3 OLCI NDVI
 
 ```
-ingest.py CGLS_NDVI300_GLOBE_OLCI_V201 CGLS_NDVI1K_GLOBE_PROBAV_V301 CGLS_NDVI1K_GLOBE_VGT_V301 \
+python ./coardas/ingest.py \
+  CGLS_NDVI300_GLOBE_OLCI_V201 CGLS_NDVI1K_GLOBE_PROBAV_V301 CGLS_NDVI1K_GLOBE_VGT_V301 \
     -o ./data/copernicus-ndvi-1km -r 1km \
     -n 'CGLS_NDVI_1km_$(yyyy)_$(mm)_d$(mdekad)' \
-    -b 2020-06-21 -e 2020-07-01 \
+    -b 1999-01-01 -e 2025-08-01 \
     --aoi -26.0 38.0 60.0 -35.0 \
-    -m CGLS_NDVI300_GLOBE_OLCI_V201 ./data/NDVI_300m_V2 r \
-    -m CGLS_NDVI1K_GLOBE_PROBAV_V301 ./data/NDVI_1km_V3 r \
-    -m CGLS_NDVI1K_GLOBE_VGT_V301 ./data/NDVI_1km_V3 r \
+    -m CGLS_NDVI300_GLOBE_OLCI_V201 /mirror/ndvi/ndvi_300m_v2_10daily r \
+    -m CGLS_NDVI1K_GLOBE_PROBAV_V301 /mirror/ndvi/ndvi_1km_v3_10daily r \
+    -m CGLS_NDVI1K_GLOBE_VGT_V301 /mirror/ndvi/ndvi_1km_v3_10daily r \
     -u <your copernicus username> -p <your copernicus password> \
     -s /var/tmp
 ```
