@@ -8,8 +8,10 @@ Author: Rob Marjot, March 2023
 import logging
 import re
 import shutil
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
+from typing import Generator
 
 import requests
 from tqdm import tqdm
@@ -35,6 +37,7 @@ class CGLSProductAccessor:
         product: CGLSProduct,
         mirror: Path | None = None,
         mirror_is_readonly: bool = False,
+        scratch_dir: Path | None = None,
     ) -> None:
         self.__username = username
         self.__password = password
@@ -43,6 +46,7 @@ class CGLSProductAccessor:
         self.__mirror_is_readonly = mirror_is_readonly if mirror is not None else True
         # immediately load manifest and keep:
         self.__manifest = requests.get(product.manifest_url).text.splitlines()
+        self.__scratch_dir = scratch_dir
 
     @property
     def product(self):
@@ -59,9 +63,10 @@ class CGLSProductAccessor:
         path = timestep.resolve(self.__product.patn_manifest)
         return self.__get_manifest_index(path)[0] >= 0
 
+    @contextmanager
     def download(
         self, timestep: Dekad, target_location: Path = None, return_mirror_location: bool = True
-    ) -> Path | None:
+    ) -> Generator[Path | None, None, None]:
         """
         Robust downloading of the data file or retrieval from mirror. When actual download is needed and  the accesor
         is configured to have a non read-only mirror, the download is saved in mirror -- in which case the download may
@@ -71,7 +76,8 @@ class CGLSProductAccessor:
 
         i, m = self.__get_manifest_index(timestep.resolve(self.__product.patn_manifest))
         if i < 0:
-            return None
+            yield None
+            return
 
         datafile = timestep.resolve(
             self.__product.patn_datafile, None if m is None else m.groupdict()
@@ -83,22 +89,26 @@ class CGLSProductAccessor:
             mirrorfile = self.__mirror.joinpath(datafile)
         if target_location is not None:
             targetfile = target_location.joinpath(datafile)
-        else:
+        elif mirrorfile is not None:
             targetfile = mirrorfile
-
-        if mirrorfile is None and targetfile is None:
-            raise RuntimeError()
+        else:
+            targetfile = self.__scratch_dir.joinpath(datafile)
 
         if targetfile.exists():
-            return targetfile
+            yield targetfile
+            return
 
         if mirrorfile is not None and mirrorfile.exists():
-            if not return_mirror_location:
-                if mirrorfile != targetfile:
-                    shutil.copy(mirrorfile, targetfile)
-                return targetfile
-            else:
-                return mirrorfile
+            if not return_mirror_location and mirrorfile != targetfile:
+                shutil.copy(mirrorfile, targetfile)
+                try:
+                    yield targetfile
+                finally:
+                    if target_location is None:
+                        targetfile.unlink()
+                    return
+            yield mirrorfile
+            return
         elif mirrorfile is None or self.__mirror_is_readonly:
             if mirrorfile == targetfile:
                 raise RuntimeError(f"Attempt to write to read-only mirror! ({mirrorfile})")
@@ -113,6 +123,7 @@ class CGLSProductAccessor:
         total_size = int(r.headers.get("content-length", 0))
         pbar = tqdm(total=total_size, unit="iB", unit_scale=True)
 
+        downloadfile.parent.mkdir(parents=True, exist_ok=True)
         with downloadfile.open("wb") as f:
             for data in r.iter_content(CGLSProductAccessor.BUFFER_SIZE):
                 pbar.update(len(data))
@@ -121,15 +132,24 @@ class CGLSProductAccessor:
 
         if mirrorfile is not None and not self.__mirror_is_readonly:
             shutil.move(downloadfile, mirrorfile)
-            if not return_mirror_location:
-                if mirrorfile != targetfile:
-                    shutil.copy(mirrorfile, targetfile)
-                return targetfile
-            else:
-                return mirrorfile
+            if not return_mirror_location and mirrorfile != targetfile:
+                shutil.copy(mirrorfile, targetfile)
+                try:
+                    yield targetfile
+                finally:
+                    if target_location is None:
+                        targetfile.unlink()
+                    return
+            yield mirrorfile
+            return
         else:
             shutil.move(downloadfile, targetfile)
-            return targetfile
+            try:
+                yield targetfile
+            finally:
+                if target_location is None:
+                    targetfile.unlink()
+                return
 
 
 class CGLSProductAssimilator:
@@ -189,7 +209,12 @@ class CGLSProductAssimilator:
     ):
         self.__products.append(
             CGLSProductAccessor(
-                self.__username, self.__password, product, mirror, mirror_is_readonly
+                self.__username,
+                self.__password,
+                product,
+                mirror,
+                mirror_is_readonly,
+                self.__scratch,
             )
         )
 
@@ -233,16 +258,16 @@ class CGLSProductAssimilator:
             return _tested_aoi
 
         for i, dekad in product_first_hit.items():
-            datafile = self.__products[i].download(dekad)
-            translators.append(
-                self.__products[i].product.get_translator(
-                    datafile, self.__products[i].product.variable, self.target_resolution
+            with self.__products[i].download(dekad, self.__scratch) as datafile:
+                translators.append(
+                    self.__products[i].product.get_translator(
+                        datafile, self.__products[i].product.variable, self.target_resolution
+                    )
                 )
-            )
-            self.__aligned_aoi = find_aligned_aoi(len(translators) - 1)
-            if self.__aligned_aoi is None:
-                log.error("Unable to establish an aligned AOI across products")
-                return False
+                self.__aligned_aoi = find_aligned_aoi(len(translators) - 1)
+                if self.__aligned_aoi is None:
+                    log.error("Unable to establish an aligned AOI across products")
+                    return False
 
         return True
 
@@ -252,19 +277,19 @@ class CGLSProductAssimilator:
         def access_and_translate(dekad: Dekad) -> Path | None:
             for product in self.__products:
                 if product.is_advertised(dekad):
-                    datafile = product.download(dekad)
-                    t = product.product.get_translator(
-                        datafile, product.product.variable, self.target_resolution
-                    )
-                    assert CGLSTranslator.aois_are_equal(
-                        t.get_aligned_aoi(self.aligned_aoi), self.aligned_aoi
-                    )
-                    return t.translate(
-                        datafile,
-                        product.product.variable,
-                        self.aligned_aoi,
-                        self.output_dir.joinpath(dekad.resolve(self.__naming_pattern)),
-                    )
+                    with product.download(dekad) as datafile:
+                        t = product.product.get_translator(
+                            datafile, product.product.variable, self.target_resolution
+                        )
+                        assert CGLSTranslator.aois_are_equal(
+                            t.get_aligned_aoi(self.aligned_aoi), self.aligned_aoi
+                        )
+                        return t.translate(
+                            datafile,
+                            product.product.variable,
+                            self.aligned_aoi,
+                            self.output_dir.joinpath(dekad.resolve(self.__naming_pattern)),
+                        )
 
         cursor: Dekad = Dekad(self.__begin_date)
         while not cursor.ends_after(Dekad(self.__end_date)):

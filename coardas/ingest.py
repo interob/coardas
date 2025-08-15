@@ -132,7 +132,15 @@ def ingest(
     scratch_dir = Path(tempfile.gettempdir()) if len(scratch_dir) == 0 else Path(scratch_dir)
 
     assimilator = CGLSProductAssimilator(
-        resolution, aoi, Path(output_dir), naming_pattern, begin_date, end_date, username, password
+        resolution,
+        aoi,
+        Path(output_dir),
+        naming_pattern,
+        begin_date,
+        end_date,
+        username,
+        password,
+        scratch_dir,
     )
     for product in products:
         # Setup a product accessors for each selected product:

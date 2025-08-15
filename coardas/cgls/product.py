@@ -70,11 +70,9 @@ class CGLSProduct:
         else:
             with xr.open_dataset(datafile.as_posix(), mask_and_scale=False) as ds:
                 ds: xr.Dataset
-                gt = tuple(float(f) for f in str(ds["crs"].attrs["GeoTransform"]).split())
                 shape = ds[variable].shape
                 if product_pixels_per_degree == target_pixels_per_degree:
                     return CGLSTranslator(
-                        gt,
                         (shape[1], shape[2]),
                         list(ds.coords["lat"].values),
                         list(ds.coords["lon"].values),
@@ -85,7 +83,6 @@ class CGLSProduct:
                     )
                 else:
                     return CGLSResamplingTranslator(
-                        gt,
                         (shape[1], shape[2]),
                         list(ds.coords["lat"].values),
                         list(ds.coords["lon"].values),

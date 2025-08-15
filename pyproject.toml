@@ -13,8 +13,8 @@ dependencies = [
     "requests",
     "tqdm",
     "dask[complete]",
-    "xarray==0.17.0",
-    "rioxarray==0.15.0",
+    "xarray",
+    "rioxarray",
     "rasterio",
     "netCDF4"
 ]

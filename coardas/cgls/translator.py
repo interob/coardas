@@ -18,6 +18,10 @@ from rasterio.io import BufferedDatasetWriter
 log = logging.getLogger(__name__)
 
 
+def sign(from_value, to_value: int = 1) -> int:
+    return to_value if from_value >= 0 else (-1 * to_value)
+
+
 class CGLSTranslator:
     """
     Basic translator that can do subsetting on an image without any resampling. An AOI is
@@ -44,7 +48,6 @@ class CGLSTranslator:
 
     def __init__(
         self,
-        gt: tuple[float, float, float, float, float, float],
         shape: tuple[int, int],
         lats: list[float],
         lons: list[float],
@@ -54,7 +57,14 @@ class CGLSTranslator:
         fill_value: int,
     ) -> None:
         super().__init__()
-        self.__gt = gt
+        self.__gt = (
+            float(lons[0]),
+            round(sign(lons[1] - lons[0]) * float(1 / native_resolution), 10),
+            float(0),
+            float(lats[0]),
+            float(0),
+            round(sign(lats[1] - lats[0]) * float(1 / native_resolution), 10),
+        )
         self.__shape = shape
         self.__lats = lats
         self.__lons = lons
@@ -136,17 +146,22 @@ class CGLSTranslator:
         variable: str,
         my_ext: tuple[float, float, float, float],
         output_path: Path,
+        overwrite: bool = False,
     ) -> Path | None:
         """
         Translate the data: subset and store as TIFF
         """
 
-        def sign(value) -> int:
-            return 1 if value >= 0 else -1
-
         def find_nearest(array, value):
             array = np.asarray(array)
             return (np.abs(array - value)).argmin()
+
+        output_path = output_path.with_suffix(".tif")
+        if output_path.exists() and not overwrite:
+            log.info(f"Skipping {datafile}; output file exists: {output_path}...")
+            return output_path
+
+        log.info(f"Translating: {datafile}...")
 
         window = (
             find_nearest(self.lons, my_ext[0]),
@@ -157,66 +172,62 @@ class CGLSTranslator:
 
         __options = {**xr.get_options().mapping}
         try:
-            try:
-                xr.set_options(keep_attrs=True)
-                rio.set_options(skip_missing_spatial_dims=False)
-                with xr.open_dataset(datafile, mask_and_scale=False) as ds:
-                    valid_range = ds[variable].attrs["valid_range"]
-                    ds: xr.Dataset
-                    grid = (
-                        ds[variable]
-                        .isel(lon=slice(window[0], window[2]), lat=slice(window[1], window[3]))
-                        .to_numpy()
-                    )[0, :, :]
-                    grid = np.where(
-                        (grid >= valid_range[0]) & (grid <= valid_range[1]),
-                        grid,
-                        ds[variable].attrs["_FillValue"],
-                    )
+            xr.set_options(keep_attrs=True)
+            rio.set_options(skip_missing_spatial_dims=False)
+            with xr.open_dataset(datafile, mask_and_scale=False) as ds:
+                valid_range = ds[variable].attrs["valid_range"]
+                ds: xr.Dataset
+                grid = (
+                    ds[variable]
+                    .isel(lon=slice(window[0], window[2]), lat=slice(window[1], window[3]))
+                    .to_numpy()
+                )[0, :, :]
+                grid = np.where(
+                    (grid >= valid_range[0]) & (grid <= valid_range[1]),
+                    grid,
+                    ds[variable].attrs["_FillValue"],
+                )
 
-                    output_path = output_path.with_suffix(".tif")
-                    if output_path.exists():
-                        output_path.unlink()
-                    else:
-                        output_path.parent.mkdir(parents=True, exist_ok=True)
+                if output_path.exists():
+                    output_path.unlink()
+                else:
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
 
-                    log.info(f"Writing: {output_path}...")
-                    with rasterio.open(
-                        output_path,
-                        "w",
-                        width=window[2] - window[0],
-                        height=window[3] - window[1],
-                        count=1,
-                        crs="EPSG:4326",
-                        transform=rasterio.Affine.from_gdal(
-                            round(
-                                my_ext[0] - (sign(self.gt[1]) * (0.5 / self.native_resolution)), 8
-                            ),
-                            round(sign(self.gt[1]) * (1 / self.native_resolution), 8),
-                            0.0,
-                            round(
-                                my_ext[1] - (sign(self.gt[5]) * (0.5 / self.native_resolution)), 8
-                            ),
-                            0.0,
-                            round(sign(self.gt[5]) * (1 / self.native_resolution), 8),
-                        ),
-                        dtype=str(grid.dtype),
-                        nodata=ds[variable].attrs["_FillValue"],
-                        driver="COG",
-                        blocksize=256,
-                        compress="LZW",
-                        level=9,
-                        overviews="NONE",
-                    ) as cog:
-                        cog: BufferedDatasetWriter
-                        cog.offsets = [ds[variable].attrs["add_offset"]]
-                        cog.scales = [ds[variable].attrs["scale_factor"]]
-                        cog.write(grid, 1)
-                        return output_path
+                log.info(f"Writing: {output_path}...")
+                with rasterio.open(
+                    output_path,
+                    "w",
+                    width=window[2] - window[0],
+                    height=window[3] - window[1],
+                    count=1,
+                    crs="EPSG:4326",
+                    transform=rasterio.Affine.from_gdal(
+                        round(my_ext[0] - (sign(self.gt[1]) * (0.5 / self.native_resolution)), 8),
+                        round(sign(self.gt[1]) * (1 / self.native_resolution), 8),
+                        0.0,
+                        round(my_ext[1] - (sign(self.gt[5]) * (0.5 / self.native_resolution)), 8),
+                        0.0,
+                        round(sign(self.gt[5]) * (1 / self.native_resolution), 8),
+                    ),
+                    dtype=str(grid.dtype),
+                    nodata=ds[variable].attrs["_FillValue"],
+                    driver="COG",
+                    blocksize=256,
+                    compress="LZW",
+                    level=9,
+                    overviews="NONE",
+                ) as cog:
+                    cog: BufferedDatasetWriter
+                    cog.offsets = [ds[variable].attrs["add_offset"]]
+                    cog.scales = [ds[variable].attrs["scale_factor"]]
+                    cog.write(grid, 1)
+                    return output_path
 
-            except Exception as ex:
-                str(ex)
-                return None
+        except Exception as ex:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            log.error(message)
+            raise
         finally:
             try:
                 __options.pop("enable_cftimeindex", None)
@@ -233,7 +244,6 @@ class CGLSTranslator:
 class CGLSResamplingTranslator(CGLSTranslator):
     def __init__(
         self,
-        gt: tuple[float, float, float, float, float, float],
         shape: tuple[int, int],
         lats: list[float],
         lons: list[float],
@@ -244,7 +254,13 @@ class CGLSResamplingTranslator(CGLSTranslator):
         fill_value: int,
     ) -> None:
         super().__init__(
-            gt, shape, lats, lons, native_resolution, scale_factor, add_offset, fill_value
+            shape,
+            lats,
+            lons,
+            native_resolution,
+            scale_factor,
+            add_offset,
+            fill_value,
         )
         assert (native_resolution % target_resolution) == 0
         self.__target_resolution = target_resolution
@@ -256,13 +272,15 @@ class CGLSResamplingTranslator(CGLSTranslator):
     def get_aligned_aoi(
         self, my_ext: tuple[float, float, float, float]
     ) -> tuple[float, float, float, float]:
+        return self._get_aligned_aoi(my_ext, False)
+
+    def _get_aligned_aoi(
+        self, my_ext: tuple[float, float, float, float], apply_look_around: bool
+    ) -> tuple[float, float, float, float]:
         def find_nearest(array, value):
             array = np.asarray(array)
             idx = (np.abs(array - value)).argmin()
             return array[idx]
-
-        def sign(value) -> int:
-            return 1 if value >= 0 else -1
 
         assert my_ext[0] <= my_ext[2], (
             "min Longitude is bigger than correspond Max, pls change position or check values."
@@ -270,9 +288,9 @@ class CGLSResamplingTranslator(CGLSTranslator):
         assert my_ext[1] >= my_ext[3], (
             "min Latitude is bigger than correspond Max, pls change position or check values."
         )
-        assert (
-            self.lons[0] <= my_ext[0] <= self.lons[-1]  # ds.lon
-        ), "min Longitudinal value out of original dataset Max ext."
+        assert self.lons[0] <= my_ext[0] <= self.lons[-1], (
+            "min Longitudinal value out of original dataset Max ext."
+        )
         assert self.lats[-1] <= my_ext[1] <= self.lats[0], (
             "Max Latitudinal value out of original dataset Max ext."
         )
@@ -286,27 +304,42 @@ class CGLSResamplingTranslator(CGLSTranslator):
 
         dy = round(self.shape[0] * sign(self.gt[5]) * (1 / self.native_resolution))
         dx = round(self.shape[1] * sign(self.gt[1]) * (1 / self.native_resolution))
-        lat_target = np.round(np.arange(80.0, -60.0, -1.0 / 112), 8)
+
         lat_target = np.round(
             np.arange(self.gt[3], self.gt[3] + dy, sign(self.gt[5]) / self.target_resolution), 8
         )
-        lat_target = np.arange(
-            self.gt[3], self.gt[3] + dy, sign(self.gt[5]) / self.target_resolution
-        )
-        lon_target = np.round(np.arange(-180.0, 180.0, 1.0 / 112), 8)
         lon_target = np.round(
             np.arange(self.gt[0], self.gt[0] + dx, sign(self.gt[1]) / self.target_resolution), 8
         )
-        lon_target = np.arange(
-            self.gt[0], self.gt[0] + dx, sign(self.gt[1]) / self.target_resolution
+
+        look_around = (
+            ((self.native_resolution - self.target_resolution) // self.target_resolution) // 2
+            if apply_look_around
+            else 0
         )
         return (
             # UL
-            find_nearest(self.lons, find_nearest(lon_target, my_ext[0])),
-            find_nearest(self.lats, find_nearest(lat_target, my_ext[1])),
+            find_nearest(
+                self.lons,
+                find_nearest(lon_target, my_ext[0])
+                - (sign(self.gt[1], look_around) / self.native_resolution),
+            ),
+            find_nearest(
+                self.lats,
+                find_nearest(lat_target, my_ext[1])
+                - (sign(self.gt[5], look_around) / self.native_resolution),
+            ),
             # LR
-            find_nearest(self.lons, find_nearest(lon_target, my_ext[2])),
-            find_nearest(self.lats, find_nearest(lat_target, my_ext[3])),
+            find_nearest(
+                self.lons,
+                find_nearest(lon_target, my_ext[2])
+                + (sign(self.gt[1], look_around) / self.native_resolution),
+            ),
+            find_nearest(
+                self.lats,
+                find_nearest(lat_target, my_ext[3])
+                + (sign(self.gt[5], look_around) / self.native_resolution),
+            ),
         )
 
     def translate(
@@ -315,16 +348,19 @@ class CGLSResamplingTranslator(CGLSTranslator):
         variable: str,
         my_ext: tuple[float, float, float, float],
         output_path: Path,
+        overwrite: bool = False,
     ) -> Path | None:
-        def sign(value) -> int:
-            return 1 if value >= 0 else -1
+        output_path = output_path.with_suffix(".tif")
+        if output_path.exists() and not overwrite:
+            log.info(f"Skipping {datafile}; output file exists: {output_path}...")
+            return output_path
 
         log.info(f"Translating: {datafile}...")
 
         with xr.open_dataset(datafile, mask_and_scale=False) as ds:
             chunks = dict(zip(ds[variable].dims, ds[variable].encoding["chunksizes"]))
         with xr.open_dataset(datafile, mask_and_scale=False, chunks=chunks) as ds:
-            aoi = self.get_aligned_aoi(my_ext)
+            aoi = self._get_aligned_aoi(my_ext, True)
             da: xr.DataArray = ds[variable].sel(
                 lon=slice(aoi[0], aoi[2]), lat=slice(aoi[1], aoi[3])
             )
@@ -355,7 +391,7 @@ class CGLSResamplingTranslator(CGLSTranslator):
                         .to_numpy()
                         .astype(np.dtype("B"))
                     )[0, :, :]
-                    output_path = output_path.with_suffix(".tif")
+
                     if output_path.exists():
                         output_path.unlink()
                     else:
